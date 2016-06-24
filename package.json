@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/rBurgett/home-space-check/issues"
   },
-  "homepage": "https://github.com/rBurgett/home-space-check#readme"
+  "homepage": "https://github.com/rBurgett/home-space-check#readme",
+  "devDependencies": {
+    "eslint": "^2.13.1"
+  }
 }
