@@ -32,6 +32,8 @@ var _performanceNow = require('performance-now');
 
 var _performanceNow2 = _interopRequireDefault(_performanceNow);
 
+var _singleLineLog = require('single-line-log');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var largeSize = 500000000;
@@ -42,6 +44,7 @@ var home = process.env.HOME;
 
 var checkFolder = function checkFolder(p) {
     return new _promise2.default(function (resolve) {
+        (0, _singleLineLog.stdout)('Checking: ' + p);
         (0, _co2.default)(_regenerator2.default.mark(function _callee() {
             var items, largeFiles, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, f, filePath, stats;
 
@@ -237,10 +240,14 @@ var checkFolder = function checkFolder(p) {
                     return _context2.finish(27);
 
                 case 35:
+                    // let count = 0;
+                    // const len = folders.length;
                     folderPromises = folders.map(function (f) {
                         return new _promise2.default(function (resolve, reject) {
                             checkFolder(f).then(function (files) {
-                                return resolve(files);
+                                // count++;
+                                // log(`Checking files... ${((count / len) * 100).toFixed()}% complete.`);
+                                resolve(files);
                             }).catch(function (err) {
                                 return reject(err);
                             });
@@ -257,18 +264,10 @@ var checkFolder = function checkFolder(p) {
                         return a.localeCompare(b);
                     });
 
-
-                    try {
-                        _fs2.default.writeFileSync('large-files.txt', largeFiles.join('\n'), 'utf8');
-                    } catch (err) {
-                        console.error(err);
-                    }
-
+                    _fs2.default.writeFileSync('large-files.txt', largeFiles.join('\n'), 'utf8');
                     end = (0, _performanceNow2.default)();
 
-
-                    console.log(largeFiles.length + ' files found in ' + ((end - begin) / 1000).toFixed() + ' seconds.\nFile list saved to large-files.txt.');
-
+                    (0, _singleLineLog.stdout)(largeFiles.length + ' files found in ' + ((end - begin) / 1000).toFixed() + ' seconds.\nFile list saved to large-files.txt.');
                     _context2.next = 48;
                     break;
 

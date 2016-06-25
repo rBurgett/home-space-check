@@ -27,6 +27,7 @@
   "dependencies": {
     "co": "^4.6.0",
     "performance-now": "^0.2.0",
-    "promisify-node": "^0.4.0"
+    "promisify-node": "^0.4.0",
+    "single-line-log": "^1.1.1"
   }
 }

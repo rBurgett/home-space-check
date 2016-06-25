@@ -3,6 +3,7 @@ import promisify from 'promisify-node';
 import co from 'co';
 import path from 'path';
 import now from 'performance-now';
+import { stdout as log } from 'single-line-log';
 
 const largeSize = 500000000;
 
@@ -11,6 +12,7 @@ const fs = promisify(origFS);
 const home = process.env.HOME;
 
 const checkFolder = p => new Promise(resolve => {
+    log(`Checking: ${p}`);
     co(function* () {
         const items = yield fs.readdir(p);
         let largeFiles = [];
@@ -34,9 +36,7 @@ const checkFolder = p => new Promise(resolve => {
 });
 
 co(function* () {
-
     const begin = now();
-
     try {
         const items = yield fs.readdir(home);
         let folders = [];
@@ -45,32 +45,27 @@ co(function* () {
             const stats = yield fs.stat(itemPath);
             if(stats.isDirectory()) folders.push(itemPath);
         }
-
+        // let count = 0;
+        // const len = folders.length;
         const folderPromises = folders.map(f => new Promise((resolve, reject) => {
             checkFolder(f)
-                .then(files => resolve(files))
+                .then(files => {
+                    // count++;
+                    // log(`Checking files... ${((count / len) * 100).toFixed()}% complete.`);
+                    resolve(files);
+                })
                 .catch(err => reject(err));
         }));
-
         const results = yield Promise.all(folderPromises);
         const largeFiles = results
             .reduce((arr, files) => {
                 return arr.concat(files);
             }, [])
             .sort((a, b) => a.localeCompare(b));
-
-        try {
-            origFS.writeFileSync('large-files.txt', largeFiles.join('\n'), 'utf8');
-        } catch(err) {
-            console.error(err);
-        }
-
+        origFS.writeFileSync('large-files.txt', largeFiles.join('\n'), 'utf8');
         const end = now();
-
-        console.log(`${largeFiles.length} files found in ${((end - begin) / 1000).toFixed()} seconds.\nFile list saved to large-files.txt.`);
-
+        log(`${largeFiles.length} files found in ${((end - begin) / 1000).toFixed()} seconds.\nFile list saved to large-files.txt.`);
     } catch(err) {
         console.error(err);
     }
-
 });
