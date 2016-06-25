@@ -64,7 +64,9 @@ co(function* () {
             .sort((a, b) => a.localeCompare(b));
         origFS.writeFileSync('large-files.txt', largeFiles.join('\n'), 'utf8');
         const end = now();
-        log(`${largeFiles.length} files found in ${((end - begin) / 1000).toFixed()} seconds.\nFile list saved to large-files.txt.`);
+        log.clear();
+        log(`${largeFiles.length} files found in ${((end - begin) / 1000).toFixed()} seconds.\n`);
+        console.log('Results saved to: large-files.txt\n');
     } catch(err) {
         console.error(err);
     }

@@ -267,20 +267,22 @@ var checkFolder = function checkFolder(p) {
                     _fs2.default.writeFileSync('large-files.txt', largeFiles.join('\n'), 'utf8');
                     end = (0, _performanceNow2.default)();
 
-                    (0, _singleLineLog.stdout)(largeFiles.length + ' files found in ' + ((end - begin) / 1000).toFixed() + ' seconds.\nFile list saved to large-files.txt.');
-                    _context2.next = 48;
+                    _singleLineLog.stdout.clear();
+                    (0, _singleLineLog.stdout)(largeFiles.length + ' files found in ' + ((end - begin) / 1000).toFixed() + ' seconds.\n');
+                    console.log('Results saved to: large-files.txt\n');
+                    _context2.next = 50;
                     break;
 
-                case 45:
-                    _context2.prev = 45;
+                case 47:
+                    _context2.prev = 47;
                     _context2.t1 = _context2['catch'](1);
 
                     console.error(_context2.t1);
 
-                case 48:
+                case 50:
                 case 'end':
                     return _context2.stop();
             }
         }
-    }, _callee2, this, [[1, 45], [9, 23, 27, 35], [28,, 30, 34]]);
+    }, _callee2, this, [[1, 47], [9, 23, 27, 35], [28,, 30, 34]]);
 }));
