@@ -2,8 +2,9 @@ import origFS from 'fs';
 import promisify from 'promisify-node';
 import co from 'co';
 import path from 'path';
+import now from 'performance-now';
 
-const largeSize = 100000000;
+const largeSize = 500000000;
 
 const fs = promisify(origFS);
 
@@ -34,6 +35,8 @@ const checkFolder = p => new Promise(resolve => {
 
 co(function* () {
 
+    const begin = now();
+
     try {
         const items = yield fs.readdir(home);
         let folders = [];
@@ -53,9 +56,18 @@ co(function* () {
         const largeFiles = results
             .reduce((arr, files) => {
                 return arr.concat(files);
-            }, []);
+            }, [])
+            .sort((a, b) => a.localeCompare(b));
 
-        console.log('Large Files:\n', JSON.stringify(largeFiles, null, '  '));
+        try {
+            origFS.writeFileSync('large-files.txt', largeFiles.join('\n'), 'utf8');
+        } catch(err) {
+            console.error(err);
+        }
+
+        const end = now();
+
+        console.log(`${largeFiles.length} files found in ${((end - begin) / 1000).toFixed()} seconds.\nFile list saved to large-files.txt.`);
 
     } catch(err) {
         console.error(err);
