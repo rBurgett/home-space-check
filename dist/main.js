@@ -1,9 +1,5 @@
 'use strict';
 
-var _stringify = require('babel-runtime/core-js/json/stringify');
-
-var _stringify2 = _interopRequireDefault(_stringify);
-
 var _regenerator = require('babel-runtime/regenerator');
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
@@ -32,9 +28,13 @@ var _path = require('path');
 
 var _path2 = _interopRequireDefault(_path);
 
+var _performanceNow = require('performance-now');
+
+var _performanceNow2 = _interopRequireDefault(_performanceNow);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var largeSize = 100000000;
+var largeSize = 500000000;
 
 var fs = (0, _promisifyNode2.default)(_fs2.default);
 
@@ -161,81 +161,82 @@ var checkFolder = function checkFolder(p) {
 };
 
 (0, _co2.default)(_regenerator2.default.mark(function _callee2() {
-    var items, folders, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, f, itemPath, stats, folderPromises, results, largeFiles;
+    var begin, items, folders, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, f, itemPath, stats, folderPromises, results, largeFiles, end;
 
     return _regenerator2.default.wrap(function _callee2$(_context2) {
         while (1) {
             switch (_context2.prev = _context2.next) {
                 case 0:
-                    _context2.prev = 0;
-                    _context2.next = 3;
+                    begin = (0, _performanceNow2.default)();
+                    _context2.prev = 1;
+                    _context2.next = 4;
                     return fs.readdir(home);
 
-                case 3:
+                case 4:
                     items = _context2.sent;
                     folders = [];
                     _iteratorNormalCompletion2 = true;
                     _didIteratorError2 = false;
                     _iteratorError2 = undefined;
-                    _context2.prev = 8;
+                    _context2.prev = 9;
                     _iterator2 = (0, _getIterator3.default)(items);
 
-                case 10:
+                case 11:
                     if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
-                        _context2.next = 20;
+                        _context2.next = 21;
                         break;
                     }
 
                     f = _step2.value;
                     itemPath = _path2.default.join(home, f);
-                    _context2.next = 15;
+                    _context2.next = 16;
                     return fs.stat(itemPath);
 
-                case 15:
+                case 16:
                     stats = _context2.sent;
 
                     if (stats.isDirectory()) folders.push(itemPath);
 
-                case 17:
+                case 18:
                     _iteratorNormalCompletion2 = true;
-                    _context2.next = 10;
+                    _context2.next = 11;
                     break;
 
-                case 20:
-                    _context2.next = 26;
+                case 21:
+                    _context2.next = 27;
                     break;
 
-                case 22:
-                    _context2.prev = 22;
-                    _context2.t0 = _context2['catch'](8);
+                case 23:
+                    _context2.prev = 23;
+                    _context2.t0 = _context2['catch'](9);
                     _didIteratorError2 = true;
                     _iteratorError2 = _context2.t0;
 
-                case 26:
-                    _context2.prev = 26;
+                case 27:
                     _context2.prev = 27;
+                    _context2.prev = 28;
 
                     if (!_iteratorNormalCompletion2 && _iterator2.return) {
                         _iterator2.return();
                     }
 
-                case 29:
-                    _context2.prev = 29;
+                case 30:
+                    _context2.prev = 30;
 
                     if (!_didIteratorError2) {
-                        _context2.next = 32;
+                        _context2.next = 33;
                         break;
                     }
 
                     throw _iteratorError2;
 
-                case 32:
-                    return _context2.finish(29);
-
                 case 33:
-                    return _context2.finish(26);
+                    return _context2.finish(30);
 
                 case 34:
+                    return _context2.finish(27);
+
+                case 35:
                     folderPromises = folders.map(function (f) {
                         return new _promise2.default(function (resolve, reject) {
                             checkFolder(f).then(function (files) {
@@ -245,31 +246,42 @@ var checkFolder = function checkFolder(p) {
                             });
                         });
                     });
-                    _context2.next = 37;
+                    _context2.next = 38;
                     return _promise2.default.all(folderPromises);
 
-                case 37:
+                case 38:
                     results = _context2.sent;
                     largeFiles = results.reduce(function (arr, files) {
                         return arr.concat(files);
-                    }, []);
+                    }, []).sort(function (a, b) {
+                        return a.localeCompare(b);
+                    });
 
 
-                    console.log('Large Files:\n', (0, _stringify2.default)(largeFiles, null, '  '));
+                    try {
+                        _fs2.default.writeFileSync('large-files.txt', largeFiles.join('\n'), 'utf8');
+                    } catch (err) {
+                        console.error(err);
+                    }
 
-                    _context2.next = 45;
+                    end = (0, _performanceNow2.default)();
+
+
+                    console.log(largeFiles.length + ' files found in ' + ((end - begin) / 1000).toFixed() + ' seconds.\nFile list saved to large-files.txt.');
+
+                    _context2.next = 48;
                     break;
 
-                case 42:
-                    _context2.prev = 42;
-                    _context2.t1 = _context2['catch'](0);
+                case 45:
+                    _context2.prev = 45;
+                    _context2.t1 = _context2['catch'](1);
 
                     console.error(_context2.t1);
 
-                case 45:
+                case 48:
                 case 'end':
                     return _context2.stop();
             }
         }
-    }, _callee2, this, [[0, 42], [8, 22, 26, 34], [27,, 29, 33]]);
+    }, _callee2, this, [[1, 45], [9, 23, 27, 35], [28,, 30, 34]]);
 }));
